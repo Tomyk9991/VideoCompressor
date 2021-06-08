@@ -6,6 +6,7 @@ namespace VideoCompressor.Commands
     [System.Serializable]
     public class BitRateHolder
     {
+        public static BitRateHolder Instance { get; set; }
         public int dc { get; set; }
         
         public IDictionary<string, object> ToDictionary()

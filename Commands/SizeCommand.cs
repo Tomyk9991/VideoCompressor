@@ -64,6 +64,7 @@ namespace VideoCompressor.Commands
             {
                 string jsonString = await File.ReadAllTextAsync(STANDARDBITRATE_PATH);
                 BitRateHolder holder = JsonConvert.DeserializeObject<BitRateHolder>(jsonString);
+                BitRateHolder.Instance = holder;
                 return holder;
             }
 

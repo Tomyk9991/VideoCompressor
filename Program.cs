@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using VideoCompressor.Commands;
 using FFmpeg.NET;
@@ -10,26 +11,41 @@ namespace VideoCompressor
         public static async Task Main(string[] args)
         {
             BitRateHolder bitRates = await SizeCommand.LoadFormats();
-            
+
+            Command[] commands = new Command[5]; 
+            VersionCommand versionCommand = Command.ExtractFrom<VersionCommand>(args);
+            HelpCommand helpCommand = Command.ExtractFrom<HelpCommand>(args);
             SizeCommand sizeCommand = Command.ExtractFrom<SizeCommand>(args);
             PathCommand pathInput = Command.ExtractFrom<PathCommand>(args, 1);
             PathCommand pathOutput = Command.ExtractFrom<PathCommand>(args, 2);
+
+            commands[0] = versionCommand;
+            commands[1] = helpCommand;
+            commands[2] = sizeCommand;
+            commands[3] = pathInput;
+            commands[4] = pathOutput;
             
             if (string.IsNullOrEmpty(pathOutput.Path)) pathOutput.Path = "Output.mp4";
 
+            if (commands.Any(command => command is ICanAbortProgram {NeedAbort: true}))
+            {
+                return;
+            }
+            
             for (int i = 0; i < Console.BufferWidth; i++) Console.Write("-");
             Console.WriteLine();
+            
+            if (string.IsNullOrEmpty(pathInput.Path))
+            {
+                Console.WriteLine("Keine Eingabedatei angegeben.");
+                return;
+            }
             
             Console.WriteLine(
                 sizeCommand.HasTargetSize
                     ? sizeCommand.ToIntendedSizePrintingString()
                     : $"Standardbitrate von\t\t\t\t{bitRates.dc / 100.0f:F} kbit/s");
 
-            if (string.IsNullOrEmpty(pathInput.Path))
-            {
-                Console.WriteLine("Keine Eingabedatei angegeben.");
-                return;
-            }
 
             MediaFile inputFile = new MediaFile(pathInput.Path);
             MediaFile outputFile = new MediaFile(pathOutput.Path);
