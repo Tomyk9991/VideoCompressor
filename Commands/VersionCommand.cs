@@ -11,7 +11,7 @@ namespace VideoCompressor.Commands
         {
             string withoutHyphen = value.Substring(1).ToLower();
 
-            if (withoutHyphen == "v" || withoutHyphen == "-v" || withoutHyphen == "version" || withoutHyphen == "-version")
+            if (withoutHyphen is "v" or "-v" or "version" or "-version")
             {
                 NeedAbort = true;
                 string version = Assembly.GetExecutingAssembly().GetName().Version.ToString();

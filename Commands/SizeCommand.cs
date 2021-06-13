@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using VideoCompressor.Utils;
 
 namespace VideoCompressor.Commands
 {
@@ -52,8 +53,9 @@ namespace VideoCompressor.Commands
 
         public string ToIntendedSizePrintingString()
         {
-            return this._specialFormatting == "" 
-                ? $"Die Zieldatei versucht eine Größe von: \t\t{this.FixedTargetSize}MB einzunehmen."
+            return this._specialFormatting == ""
+                ? PrintHelper.SplitStringBy("Die Zieldatei versucht eine Größe von:", ' ',
+                    $"{this.FixedTargetSize}MB einzunehmen.")
                 : $"Die Zieldatei versucht eine geeignete Größe für die Formatierung {this._specialFormatting} zu finden";
         }
 
@@ -79,11 +81,10 @@ namespace VideoCompressor.Commands
             
             return exampleHolder;
         }
-
+        
         public int BitRateFromFormatting(BitRateHolder bitRates)
         {
-            var dictionary = bitRates.ToDictionary<int>();
-            return dictionary[this._specialFormatting];
+            return BitUtils.BitRateFromFormatting(bitRates, this._specialFormatting);
         }
     }
 }

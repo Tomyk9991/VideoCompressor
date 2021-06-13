@@ -11,7 +11,7 @@ namespace VideoCompressor.Commands
         {
             string withoutHyphen = value.Substring(1).ToLower();
 
-            if (withoutHyphen == "h" || withoutHyphen == "-h" || withoutHyphen == "help" || withoutHyphen == "-help")
+            if (withoutHyphen is "h" or "-h" or "help" or "-help")
             {
                 NeedAbort = true;
                 Console.WriteLine();
@@ -37,6 +37,9 @@ namespace VideoCompressor.Commands
                 
                 Console.WriteLine();
                 Console.ForegroundColor = ConsoleColor.Gray;
+
+                Console.WriteLine("");
+                
                 return true;
             }
 

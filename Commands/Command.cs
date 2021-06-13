@@ -15,6 +15,7 @@ namespace VideoCompressor.Commands
             
             for (int i = index; i < arguments.Length; i++)
             {
+                // So not every argument will be parsed.
                 if (value.TryParse(arguments[i]))
                 {
                     return value;
