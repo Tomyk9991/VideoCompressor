@@ -12,14 +12,14 @@ namespace VideoCompressor.Commands
     {
         public int FixedTargetSize { get; private set; }
         public bool HasTargetSize { get; private set; }
-        
+
         private string _specialFormatting = "";
-        private static readonly string[] SPECIAL_COMPRESSOR_FORMATS = { "dc" };
-        
+        private static readonly string[] SPECIAL_COMPRESSOR_FORMATS = {"dc"};
+
         public override bool TryParse(string value)
         {
             string withoutHyphen = value.Substring(1).ToLower();
-            
+
             if (SPECIAL_COMPRESSOR_FORMATS.Contains(withoutHyphen)) // Special formatting
             {
                 this._specialFormatting = withoutHyphen;
@@ -53,14 +53,12 @@ namespace VideoCompressor.Commands
 
         public string ToIntendedSizePrintingString()
         {
-            return this._specialFormatting == ""
-                ? PrintHelper.SplitStringBy("Die Zieldatei versucht eine Größe von:", ' ',
-                    $"{this.FixedTargetSize}MB einzunehmen.")
-                : $"Die Zieldatei versucht eine geeignete Größe für die Formatierung {this._specialFormatting} zu finden";
+            return PrintHelper.SplitStringBy("Die Zieldatei versucht eine Größe von:", ' ',
+                $"{this.FixedTargetSize}MB einzunehmen.");
         }
 
         public static async Task<BitRateHolder> LoadFormats()
-        { 
+        {
             string STANDARDBITRATE_PATH = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "StandardBitrate.json");
             if (File.Exists(STANDARDBITRATE_PATH))
             {
@@ -75,13 +73,13 @@ namespace VideoCompressor.Commands
             {
                 dc = 4000
             };
-            
+
             stream.Write(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(exampleHolder)));
             stream.Close();
-            
+
             return exampleHolder;
         }
-        
+
         public int BitRateFromFormatting(BitRateHolder bitRates)
         {
             return BitUtils.BitRateFromFormatting(bitRates, this._specialFormatting);

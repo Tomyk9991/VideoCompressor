@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using FFmpeg.NET;
@@ -21,58 +22,43 @@ namespace VideoCompressor.Compressors
             // [4] PathCommand pathOutput = Command.ExtractFrom<PathCommand>(args, args.Length - 1);                               // 'bla.mp4'
             // [5] MultiFileCommand multiFileCommand = Command.ExtractFrom<MultiFileCommand>(args);                                // 'mf'
             // [6] MultiFileConditionCommand multiFileConditionCommand = Command.ExtractFrom<MultiFileConditionCommand>(args, 1);  // 'condition='
-            
-            
+
             SizeCommand sizeCommand = (SizeCommand) commands[2];
-            PathCommand pathInput = (PathCommand) commands[3];
-            PathCommand pathOutput = (PathCommand) commands[4];
-            
-            if (string.IsNullOrEmpty(pathOutput.Path)) pathOutput.Path = "Output.mp4";
-            if (pathInput.Path == pathOutput.Path) pathOutput.Path = "Output.mp4";
-            
-            
-            PrintHelper.DrawDivisionFullWidth();
-            
-            if (string.IsNullOrEmpty(pathInput.Path))
+            PathCommand pathInput = new PathCommand
             {
-                Console.WriteLine("Keine Eingabedatei angegeben.");
-                return;
-            }
-            
-            
+                Path = Directory.GetCurrentDirectory()
+            };
+            PrintHelper.DrawDivisionFullWidth();
+
             Console.WriteLine(
                 sizeCommand.HasTargetSize
                     ? sizeCommand.ToIntendedSizePrintingString()
-                    : PrintHelper.SplitStringBy("Standardbitrate von", ' ', $"{bitRates.dc / 100.0f:F} kbit/s"));
+                    : PrintHelper.SplitStringBy("Standardbitrate von", ' ', $"{bitRates.dc / 100.0f:F} kbit/s")
+            );
+
+            MediaFile[] inputFiles = FindMp4s(pathInput.Path);
+            MediaFile[] outputFiles = GenerateOutputFiles(inputFiles.Length);
 
 
-            MediaFile inputFile = new MediaFile(pathInput.Path);
-            MediaFile outputFile = new MediaFile(pathOutput.Path);
+            Task<MediaFile>[] runners = new Task<MediaFile>[inputFiles.Length];
+            int top = Console.CursorTop + 2 * inputFiles.Length;
             
-            if (!inputFile.FileInfo.Exists)
+            for (int i = 0; i < inputFiles.Length; i++)
             {
-                Console.WriteLine("Die angegebene Datei existiert nicht.");
-                return;
+                runners[i] = base.Compress(inputFiles[i], outputFiles[i], sizeCommand, bitRates, top + i);
             }
             
-            PrintHelper.WriteLineStringBy("Eingelesene Datei:", ' ', inputFile.FileInfo.FullName);
-            PrintHelper.WriteLineStringBy("Output Datei:", ' ', outputFile.FileInfo.FullName);
-
-            Engine ffmpeg = new Engine();
-            ConversionOptions options = await ffmpeg.BuildConversionOptions(inputFile, sizeCommand, bitRates);
-
-            if (options == null)
-                return;
-            
-            ffmpeg.BindProgressToConsole();
-            
-            
-            await ffmpeg.ConvertAsync(inputFile, outputFile, options);
+            Task.WaitAll(runners);
 
             Console.WriteLine();
             Console.WriteLine();
-            
-            PrintHelper.WriteLineStringBy("Die Größe des neues Videos beträgt:", ' ', (outputFile.FileInfo.Length / (double) 0x10_0000).ToString("F") + "MB");
+
+            for (int i = 0; i < runners.Length; i++)
+            {
+                MediaFile outputFile = runners[i].Result;
+                PrintHelper.WriteLineStringBy("Die Größe des neues Videos beträgt:", ' ',
+                    (outputFile.FileInfo.Length / (double) 0x10_0000).ToString("F") + "MB");
+            }
         }
     }
 }

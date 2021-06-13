@@ -34,15 +34,15 @@ namespace VideoCompressor.Extensions
         }
         
         
-        public static void BindProgressToConsole(this Engine ffmpeg)
+        public static void BindProgressToConsole(this Engine ffmpeg, int consoleRow)
         {
             ffmpeg.Progress += (_, eventArgs) =>
             {
                 float percentage = (float) eventArgs.ProcessedDuration.Seconds / eventArgs.TotalDuration.Seconds;
-        
+
                 if (percentage is >= 0.0f and <= 1.0f)
                 {
-                    ClearCurrentConsoleLine();
+                    ClearCurrentConsoleLine(consoleRow);
                     SetColorFromPercent(percentage);
 
                     int totalLength = 32;
@@ -83,12 +83,12 @@ namespace VideoCompressor.Extensions
             }
         }
 
-        private static void ClearCurrentConsoleLine()
+        private static void ClearCurrentConsoleLine(int consoleRow)
         {
-            int currentLineCursor = Console.CursorTop;
-            Console.SetCursorPosition(0, Console.CursorTop);
+            //int currentLineCursor = Console.CursorTop;
+            Console.SetCursorPosition(0, consoleRow);
             Console.Write(new string(' ', Console.WindowWidth));
-            Console.SetCursorPosition(0, currentLineCursor);
+            Console.SetCursorPosition(0, consoleRow);
         }
     }
 }
