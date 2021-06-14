@@ -38,7 +38,7 @@ namespace VideoCompressor.Compressors
             return outputFiles;
         }
 
-        protected async Task<MediaFile> Compress(MediaFile inputFile, MediaFile outputFile, SizeCommand sizeCommand, BitRateHolder bitRates, int topRow)
+        protected async Task<MediaFile> Compress(MediaFile inputFile, MediaFile outputFile, SizeCommand sizeCommand, BitRateHolder bitRates, int processes)
         {
             PrintHelper.WriteLineStringBy("Eingelesene Datei:", ' ', inputFile.FileInfo.FullName);
             PrintHelper.WriteLineStringBy("Output Datei:", ' ', outputFile.FileInfo.FullName);
@@ -49,7 +49,7 @@ namespace VideoCompressor.Compressors
             if (options == null)
                 return null;
 
-            ffmpeg.BindProgressToConsole(topRow);
+            ffmpeg.BindProgressToConsole();
             await ffmpeg.ConvertAsync(inputFile, outputFile, options);
 
 

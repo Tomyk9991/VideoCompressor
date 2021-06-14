@@ -38,6 +38,15 @@ namespace VideoCompressor.Commands
                 Console.WriteLine();
                 Console.ForegroundColor = ConsoleColor.Gray;
 
+                Console.WriteLine();
+                Console.WriteLine("-mf for Multi file support");
+                
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Es können Bedingungen eingebaut werden:");
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.WriteLine("startswith=\"str\"");
+                Console.WriteLine("endswith=\"str\"");
+
                 Console.WriteLine("");
                 
                 return true;

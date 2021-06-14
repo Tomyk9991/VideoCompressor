@@ -45,7 +45,7 @@ namespace VideoCompressor.Compressors
                 return;
             }
 
-            outputFile = await base.Compress(inputFile, outputFile, sizeCommand, bitRates, 0);
+            outputFile = await base.Compress(inputFile, outputFile, sizeCommand, bitRates, 1);
             
             Console.WriteLine();
             Console.WriteLine();

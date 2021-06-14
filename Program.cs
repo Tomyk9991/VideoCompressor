@@ -10,9 +10,11 @@ namespace VideoCompressor
     {
         public static async Task Main(string[] args)
         {
-            BitRateHolder bitRates = await SizeCommand.LoadFormats();
+            await SizeCommand.LoadFormats();
             List<Command> commands = new List<Command>();
-            
+
+            if (args.Length == 0) return;
+
             VersionCommand versionCommand = Command.ExtractFrom<VersionCommand>(args);                                      // -v
             HelpCommand helpCommand = Command.ExtractFrom<HelpCommand>(args);                                               // -h
             SizeCommand sizeCommand = Command.ExtractFrom<SizeCommand>(args);                                               // -dc oder -12

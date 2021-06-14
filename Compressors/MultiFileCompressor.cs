@@ -43,13 +43,17 @@ namespace VideoCompressor.Compressors
             Task<MediaFile>[] runners = new Task<MediaFile>[inputFiles.Length];
             int top = Console.CursorTop + 2 * inputFiles.Length;
             
+            int totalValue = 0;
+            
             for (int i = 0; i < inputFiles.Length; i++)
             {
-                runners[i] = base.Compress(inputFiles[i], outputFiles[i], sizeCommand, bitRates, top + i);
+                runners[i] = base.Compress(inputFiles[i], outputFiles[i], sizeCommand, bitRates, 3);
             }
             
             Task.WaitAll(runners);
 
+            totalValue = 0;
+            
             Console.WriteLine();
             Console.WriteLine();
 

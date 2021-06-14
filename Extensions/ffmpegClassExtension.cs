@@ -32,9 +32,8 @@ namespace VideoCompressor.Extensions
             Console.WriteLine();
             return options;
         }
-        
-        
-        public static void BindProgressToConsole(this Engine ffmpeg, int consoleRow)
+
+        public static void BindProgressToConsole(this Engine ffmpeg)
         {
             ffmpeg.Progress += (_, eventArgs) =>
             {
@@ -42,28 +41,33 @@ namespace VideoCompressor.Extensions
 
                 if (percentage is >= 0.0f and <= 1.0f)
                 {
-                    ClearCurrentConsoleLine(consoleRow);
-                    SetColorFromPercent(percentage);
-
-                    int totalLength = 32;
-
-                    StringBuilder builder = new StringBuilder("|");
-                    
-                    int amountHashes = (int) (percentage / (1f / totalLength));
-                    int d = totalLength - amountHashes;
-
-                    for (int i = 0; i < amountHashes; i++)
-                        builder.Append("■");
-                    
-                    for (int i = 0; i < d; i++)
-                        builder.Append("-");
-                    
-                    builder.Append("|");
-                    PrintHelper.WriteStringBy(builder.ToString(), ' ', "");
-                    Console.ForegroundColor = ConsoleColor.Gray;
-                    Console.Write((percentage * 100.0f).ToString("F") + "%");
+                    DrawProgressbar(percentage);
                 }
             };
+        }
+
+        private static void DrawProgressbar(float percentage)
+        {
+            ClearCurrentConsoleLine();
+            SetColorFromPercent(percentage);
+
+            int totalLength = 32;
+
+            StringBuilder builder = new StringBuilder("|");
+                    
+            int amountHashes = (int) (percentage / (1f / totalLength));
+            int d = totalLength - amountHashes;
+
+            for (int i = 0; i < amountHashes; i++)
+                builder.Append("■");
+                    
+            for (int i = 0; i < d; i++)
+                builder.Append("-");
+                    
+            builder.Append("|");
+            PrintHelper.WriteStringBy(builder.ToString(), ' ', "");
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.Write((percentage * 100.0f).ToString("F") + "%");
         }
         
         private static void SetColorFromPercent(float percentage)
@@ -83,12 +87,12 @@ namespace VideoCompressor.Extensions
             }
         }
 
-        private static void ClearCurrentConsoleLine(int consoleRow)
+        private static void ClearCurrentConsoleLine()
         {
             //int currentLineCursor = Console.CursorTop;
-            Console.SetCursorPosition(0, consoleRow);
+            Console.SetCursorPosition(0, Console.CursorTop);
             Console.Write(new string(' ', Console.WindowWidth));
-            Console.SetCursorPosition(0, consoleRow);
+            Console.SetCursorPosition(0, Console.CursorTop);
         }
     }
 }
