@@ -45,14 +45,14 @@ namespace VideoCompressor.Compressors
                 return;
             }
 
-            outputFile = await base.Compress(inputFile, outputFile, sizeCommand, bitRates, 1);
+            // + 2 for the written lines before
+            outputFile = await base.Compress(inputFile, outputFile, sizeCommand, bitRates, Console.CursorTop + 2);
             
             Console.WriteLine();
             Console.WriteLine();
             
             PrintHelper.WriteLineStringBy("Die Größe des neues Videos beträgt:", ' ',
                 (outputFile.FileInfo.Length / (double) 0x10_0000).ToString("F") + "MB");
-
         }
     }
 }

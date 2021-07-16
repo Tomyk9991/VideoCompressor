@@ -39,7 +39,8 @@ namespace VideoCompressor
             {
                 true when multiFileConditionCommand.Condition == null => new MultiFileCompressor(),
                 true when multiFileConditionCommand.Condition != null => new MultiFileConditionCompressor(
-                    multiFileConditionCommand.Condition),
+                    multiFileConditionCommand.Condition
+                    ),
                 false => new SingleFileCompressor(),
                 _ => null
             };

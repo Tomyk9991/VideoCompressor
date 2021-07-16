@@ -9,6 +9,8 @@ namespace VideoCompressor.Extensions
 {
     public static class ffmpegClassExtension
     {
+        private static object mutex = new();
+        
         public static async Task<ConversionOptions> BuildConversionOptions(this Engine ffmpeg, MediaFile inputFile, SizeCommand sizeCommand, BitRateHolder bitRates)
         {
             MetaData metaData = await ffmpeg.GetMetaDataAsync(inputFile);
@@ -33,7 +35,7 @@ namespace VideoCompressor.Extensions
             return options;
         }
 
-        public static void BindProgressToConsole(this Engine ffmpeg)
+        public static void BindProgressToConsole(this Engine ffmpeg, int row)
         {
             ffmpeg.Progress += (_, eventArgs) =>
             {
@@ -41,12 +43,15 @@ namespace VideoCompressor.Extensions
 
                 if (percentage is >= 0.0f and <= 1.0f)
                 {
-                    DrawProgressbar(percentage);
+                    lock (mutex)
+                    {
+                        DrawProgressbar(percentage, row);
+                    }
                 }
             };
         }
 
-        private static void DrawProgressbar(float percentage)
+        private static void DrawProgressbar(float percentage, int row)
         {
             ClearCurrentConsoleLine();
             SetColorFromPercent(percentage);
@@ -63,11 +68,17 @@ namespace VideoCompressor.Extensions
                     
             for (int i = 0; i < d; i++)
                 builder.Append("-");
-                    
+
             builder.Append("|");
+
+            int oldRow = Console.GetCursorPosition().Top;
+            Console.SetCursorPosition(0, row);
+            
             PrintHelper.WriteStringBy(builder.ToString(), ' ', "");
             Console.ForegroundColor = ConsoleColor.Gray;
             Console.Write((percentage * 100.0f).ToString("F") + "%");
+
+            Console.SetCursorPosition(0, oldRow);
         }
         
         private static void SetColorFromPercent(float percentage)
